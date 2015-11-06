@@ -29,9 +29,99 @@ public class CharityDB {
     
     static Connection conn = null;
     static Statement stmt = null;
+
+    /**
+     * 
+     * @throws IOException
+     * @throws SQLException 
+     */
+    private static void whatToDo() throws IOException, SQLException{
+        System.out.println("What would you like to do? \nEnter: 'add donor', 'add company', or 'add donation' without the quotes.");
+        String doing = read.readLine();
+        if ("add donor".equals(doing)){
+            //add donor
+            donorInfo();
+        }
+        else if ("add company".equals(doing)){
+            // add company
+            System.out.println("Still working on " + doing);
+        }
+        else if ("add donation".equals("Still working on " + doing)){
+            // add donation
+            System.out.println(doing);
+        }
+        else if ("done".equals(doing)){
+            System.out.println("\nDone. Have a nice day!");
+            System.exit(1);
+        }
+        else {
+            // Unknown command or misspelled
+            System.out.println("\nERROR: Unknown command or command misspelled. Try again.");
+            System.out.println(doing);
+            whatToDo();
+        }
+        
+    } // whatToDo()
     
+    /**
+     * 
+     * @throws IOException
+     * @throws SQLException 
+     */
+    private static void donorInfo() throws IOException, SQLException {
+        String[] donor = new String[6];
+        System.out.print("Enter last name: ");
+        donor[0] = read.readLine();
+        System.out.print("Enter first name: ");
+        donor[1] = read.readLine();
+        System.out.print("Enter address: ");
+        donor[2] = read.readLine();
+        System.out.print("City: ");
+        donor[3] = read.readLine();
+        System.out.print("State: ");
+        donor[4] = read.readLine();
+        System.out.print("Zip: ");
+        donor[5] = read.readLine();
+        // try to add donor
+        executeDonor(donor);
+        // ask if want to add another donor
+        System.out.println("\nDo you want to add another donor?"
+                        + "\nEnter: Y or N");
+        String yn = read.readLine();
+        if ("Y".equals(yn)){
+            donorInfo();
+        }
+        else if ("N".equals(yn)){
+            System.out.println("\nWhat to do now?: 'done' 'add company' 'add donation'");
+            String whatNext = read.readLine();
+            if ("done".equals(whatNext)){
+                System.out.println("\nDone. Have a nice day!");
+                System.exit(1);
+            }
+            else if ("add company".equals(whatNext)){
+                // call on "add company" method
+            }
+            else if ("add donation".equals(whatNext)){
+                // call on "add donation" method
+            }
+            else {
+                System.out.println("\nUnkown command. Try again\n");
+                whatToDo();
+            }
+        }
+        else {
+            System.out.println("\nUnkown command. Try again\n");
+            whatToDo();
+        }
+    } // donorInfo()
+    
+    /**
+     * 
+     * @param donor
+     * @throws SQLException 
+     */
     static private void executeDonor(String[] donor) throws SQLException{
-    try {
+        try {
             //STEP 2: Register JDBC driver
             Class.forName("com.mysql.jdbc.Driver");
 
@@ -107,202 +197,17 @@ public class CharityDB {
             }//end finally try
             
         }//end try
-    }// execute()
-    
-    private static void whatToDo() throws IOException, SQLException{
-        System.out.println("What would you like to do? \nEnter: 'add donor', 'add company', or 'add donation' without the quotes.");
-        String doing = read.readLine();
-        if ("add donor".equals(doing)){
-            //add donor
-            donorInfo();
-        }
-        else if ("add company".equals(doing)){
-            // add company
-            System.out.println("Still working on " + doing);
-        }
-        else if ("add donation".equals("Still working on " + doing)){
-            // add donation
-            System.out.println(doing);
-        }
-        else if ("done".equals(doing)){
-            System.out.println("\nDone. Have a nice day!");
-            System.exit(1);
-        }
-        else {
-            // Unknown command or misspelled
-            System.out.println("\nERROR: Unknown command or command misspelled. Try again.");
-            System.out.println(doing);
-            whatToDo();
-        }
-        
-    } // whatToDo()
-    
-    private static void donorInfo() throws IOException, SQLException {
-        String[] donor = new String[6];
-        System.out.print("Enter last name: ");
-        donor[0] = read.readLine();
-        System.out.print("Enter first name: ");
-        donor[1] = read.readLine();
-        System.out.print("Enter address: ");
-        donor[2] = read.readLine();
-        System.out.print("City: ");
-        donor[3] = read.readLine();
-        System.out.print("State: ");
-        donor[4] = read.readLine();
-        System.out.print("Zip: ");
-        donor[5] = read.readLine();
-        // try to add donor
-        executeDonor(donor);
-        // ask if want to add another donor
-        System.out.println("\nDo you want to add another donor?"
-                        + "\nEnter: Y or N");
-        String yn = read.readLine();
-        if ("Y".equals(yn)){
-            donorInfo();
-        }
-        else if ("N".equals(yn)){
-            System.out.println("\nWhat to do now?: 'done' 'add company' 'add donation'");
-            String whatNext = read.readLine();
-            if ("done".equals(whatNext)){
-                System.out.println("\nDone. Have a nice day!");
-                System.exit(1);
-            }
-            else if ("add company".equals(whatNext)){
-                // call on "add company" method
-            }
-            else if ("add donation".equals(whatNext)){
-                // call on "add donation" method
-            }
-            else {
-                System.out.println("\nUnkown command. Try again\n");
-                whatToDo();
-            }
-        }
-        else {
-            System.out.println("\nUnkown command. Try again\n");
-            whatToDo();
-        }
-    } // donorInfo()
+    }// executeDonor()
     
     /**
-     * @param args the command line arguments
+     *
+     * @param args
+     * @throws SQLException
+     * @throws IOException
      */
     public static void main(String[] args) throws SQLException, IOException {
         // start cycle
         whatToDo();
-        
-        Connection conn = null;
-        Statement stmt = null;
-        try {
-            //STEP 2: Register JDBC driver
-            Class.forName("com.mysql.jdbc.Driver");
-
-            //STEP 3: Open a connection
-            System.out.println("Connecting to database...");
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            // Set auto-commit to false
-            conn.setAutoCommit(false);
-            /*
-            // inter what user wishes to do
-            System.out.println("What would you like to do? \nEnter: 'add donor', 'add company', or 'add donation' without the quotes.");
-            String doing = read.readLine();
-            // if else = see what needs to be done
-            if ("add donor".equals(doing)){
-                //add donor
-                String[] donor = addDonor();
-                
-                // have another donor?
-                System.out.println("Do you want to add another donor?"
-                        + "\nEnter: Y or N");
-                String yn = read.readLine();
-                if ("Y".equals(yn)){
-                    donor = addDonor();
-                }
-                else if ("N".equals(yn)){
-                    stmt.close();
-                    conn.close();
-                }
-                else{
-                    System.out.println("ERROR: Improper answer, System closed.");
-                    stmt.close();
-                    conn.close();
-                }
-                // create connection
-                stmt = conn.createStatement();
-                String sql;
-                sql = "SELECT lastName, firstName FROM donors";
-                ResultSet rs = stmt.executeQuery(sql);
-            }
-            else if ("add company".equals(doing)){
-                // add company
-                System.out.println(doing);
-            }
-            else if ("add donation".equals(doing)){
-                // add donation
-                System.out.println(doing);
-            }
-            else {
-                // Unknown command or misspelled
-                System.out.println("ERROR: Unknown command or command misspelled");
-                System.out.println(doing);
-            }
-*/
-            /* Leave for sample
-            //STEP 4: Execute a query
-            System.out.println("Creating statement...");
-            stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT DISTINCT donorID, firstName, lastName, address, city, state, zip FROM donors "
-                    + "WHERE NOT EXISTS (SELECT * FROM donations "
-                    + "WHERE donations.donorID = donors.donorID) "
-                    + "ORDER BY donorID, lastName, firstName";
-            ResultSet rs = stmt.executeQuery(sql);
-
-            //STEP 5: Extract data from result set
-            while (rs.next()) {
-                //Retrieve by column name
-                String last = rs.getString("lastName");
-                String first = rs.getString("firstName");
-                String address = rs.getString("address");
-                String city = rs.getString("city");
-                String state = rs.getString("state");
-                String zip = rs.getString("zip");
-
-                //Display values
-                System.out.printf("%s %s\n", first, last);
-                System.out.printf("%s\n", address);
-                System.out.printf("%s, %s %s \n\n", city, state, zip);
-            }
-            */
-            //STEP 6: Clean-up environment
-            //rs.close();
-            stmt.close();
-            conn.close();
-        } catch (SQLException se) {
-            //Handle errors for JDBC
-            se.printStackTrace();
-            // in case of exception, rollback the transaction
-            conn.rollback();
-        } catch (Exception e) {
-            //Handle errors for Class.forName
-            e.printStackTrace();
-        } finally {
-            //finally block used to close resources
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException se2) {
-            }// nothing we can do
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }//end finally try
-            
-        }//end try
         
     }//end main
     

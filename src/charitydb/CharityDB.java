@@ -60,10 +60,19 @@ public class CharityDB {
                 System.out.println("Donor already in the table.");
             }
             else{
-                // add donor to table
                 System.out.println("Adding donor to table");
-                int donorID = 300;
+                int donorID = 1; // set donorID to start from 1
                 // check for free donorID
+                sql = "SELECT donorID FROM donors WHERE donorID = " + donorID +";";
+                rs = stmt.executeQuery(sql);
+                // while donorID exists
+                while (rs.next() == true){
+                    // incriment donorID by 1 and try again
+                    donorID += 1;
+                    sql = "SELECT donorID FROM donors WHERE donorID = " + donorID +";";
+                    rs = stmt.executeQuery(sql);
+                }
+                // add donor to table
                 sql = "INSERT INTO donors VALUES ("+donorID+", '"+lastName+"', '"+firstName+"', '" +address+"', '" +city+"', '" +state+"', '" +zip+"');";
                 stmt.executeUpdate(sql);
                 conn.commit();

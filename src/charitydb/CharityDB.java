@@ -2,8 +2,7 @@ package charitydb;
 
 /**
  * Konstantin Kazantsev
- * Charity Reports assignment
- * Question #3
+ * Updating Charity Database
  * @author Marietta E. Cameron
  */
 
@@ -45,6 +44,7 @@ public class CharityDB {
         else if ("add company".equals(doing)){
             // add company
             System.out.println("Still working on " + doing);
+            companyInfo();
         }
         else if ("add donation".equals("Still working on " + doing)){
             // add donation
@@ -199,13 +199,28 @@ public class CharityDB {
         }//end try
     }// executeDonor()
     
+    private static void companyInfo() throws IOException{
+        String[] company = new String[8];
+        System.out.print("Name of company: ");
+        company[0] = read.readLine();
+        System.out.print("Address: ");
+        System.out.print("City: ");
+        System.out.print("State: ");
+        System.out.print("Zip: ");
+        System.out.println("Optional:");
+        System.out.print("Match Percent (1%-200%): ");
+        System.out.print("Min Match (minimum 1%): ");
+        System.out.print("Max Match (minimum 1%: ");
+    }
+    
+    
     /**
      *
      * @param args
      * @throws SQLException
      * @throws IOException
      */
-    public static void main(String[] args) throws SQLException, IOException {
+    public static void main(String[] args) throws IOException, SQLException{
         // start cycle
         whatToDo();
         

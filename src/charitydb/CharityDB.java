@@ -39,29 +39,16 @@ public class CharityDB {
     private static void whatToDo() throws IOException, SQLException{
         System.out.println("What would you like to do? \nEnter: 'add donor', 'add company', or 'add donation' without the quotes.");
         String doing = read.readLine();
-        if ("add donor".equals(doing)){
-            //add donor
-            donorInfo();
-        }
-        else if ("add company".equals(doing)){
-            // add company
-            companyInfo();
-        }
-        else if ("add donation".equals(doing)){
-            // add donation
-            System.out.println("Still working on " + doing);
-        }
-        else if ("done".equals(doing)){
-            System.out.println("\nDone. Have a nice day!");
-            System.exit(1);
-        }
+        if ("add donor".equals(doing)){donorInfo();}
+        else if ("add company".equals(doing)){companyInfo();}
+        else if ("add donation".equals(doing)){addDonation();}
+        else if ("done".equals(doing)){System.out.println("\nDone. Have a nice day!");System.exit(1);}
         else {
             // Unknown command or misspelled
             System.out.println("\nERROR: Unknown command or command misspelled. Try again.");
             System.out.println(doing);
             whatToDo();
         }
-        
     } // whatToDo()
     
     /**
@@ -89,9 +76,7 @@ public class CharityDB {
         System.out.println("\nDo you want to add another donor?"
                         + "\nEnter: Y or N");
         String yn = read.readLine();
-        if ("Y".equals(yn)){
-            donorInfo();
-        }
+        if ("Y".equals(yn)){donorInfo();}
         else if ("N".equals(yn)){
             System.out.println("\nWhat to do now?: 'done' 'add company' 'add donation'");
             String whatNext = read.readLine();
@@ -99,12 +84,8 @@ public class CharityDB {
                 System.out.println("\nDone. Have a nice day!");
                 System.exit(1);
             }
-            else if ("add company".equals(whatNext)){
-                companyInfo();
-            }
-            else if ("add donation".equals(whatNext)){
-                // call on "add donation" method
-            }
+            else if ("add company".equals(whatNext)){companyInfo();}
+            else if ("add donation".equals(whatNext)){addDonation();}
             else {
                 System.out.println("\nUnkown command. Try again\n");
                 whatToDo();
@@ -180,15 +161,11 @@ public class CharityDB {
         } finally {
             //finally block used to close resources
             try {
-                if (stmt != null) {
-                    stmt.close();
-                }
+                if (stmt != null) {stmt.close();}
             } catch (SQLException se2) {
             }// nothing we can do
             try {
-                if (conn != null) {
-                    conn.close();
-                }
+                if (conn != null) {conn.close();}
             } catch (SQLException se) {
                 se.printStackTrace();
             }//end finally try
@@ -235,9 +212,7 @@ public class CharityDB {
                 System.exit(1);
             }
             else if ("add donor".equals(whatNext)){donorInfo();}
-            else if ("add donation".equals(whatNext)){
-                // call on "add donation" method
-            }
+            else if ("add donation".equals(whatNext)){addDonation();}
             else {
                 System.out.println("\nUnkown command. Try again\n");
                 whatToDo();
@@ -312,15 +287,11 @@ public class CharityDB {
         } finally {
             //finally block used to close resources
             try {
-                if (stmt != null) {
-                    stmt.close();
-                }
+                if (stmt != null) {stmt.close();}
             } catch (SQLException se2) {
             }// nothing we can do
             try {
-                if (conn != null) {
-                    conn.close();
-                }
+                if (conn != null) {conn.close();}
             } catch (SQLException se) {
                 se.printStackTrace();
             }//end finally try
@@ -328,7 +299,22 @@ public class CharityDB {
         }//end try
     }// executeCompany()
     
-    
+    private static void addDonation() throws IOException{
+        System.out.print("Last name of donor: ");
+        String lastName = read.readLine();
+        System.out.print("First name of donor: ");
+        String firstName = read.readLine();
+        System.out.print("Name of matching company: ");
+        String company = read.readLine();
+        System.out.print("Amount donated (amount over $0): $");
+        String donated = read.readLine();
+        // get donorID
+        // if donor not in table, ask to have donor first be added
+        // else: check for unused 'donationNumber'
+        // add recod to donation table
+        // ask if user wants to add another donation
+        // else: what user wants to do next
+    }
     
     /**
      *

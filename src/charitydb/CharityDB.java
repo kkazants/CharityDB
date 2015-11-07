@@ -28,6 +28,8 @@ public class CharityDB {
     
     static Connection conn = null;
     static Statement stmt = null;
+    static String sql;
+    static ResultSet rs;
 
     /**
      * 
@@ -43,12 +45,11 @@ public class CharityDB {
         }
         else if ("add company".equals(doing)){
             // add company
-            System.out.println("Still working on " + doing);
             companyInfo();
         }
-        else if ("add donation".equals("Still working on " + doing)){
+        else if ("add donation".equals(doing)){
             // add donation
-            System.out.println(doing);
+            System.out.println("Still working on " + doing);
         }
         else if ("done".equals(doing)){
             System.out.println("\nDone. Have a nice day!");
@@ -99,7 +100,7 @@ public class CharityDB {
                 System.exit(1);
             }
             else if ("add company".equals(whatNext)){
-                // call on "add company" method
+                companyInfo();
             }
             else if ("add donation".equals(whatNext)){
                 // call on "add donation" method
@@ -121,34 +122,30 @@ public class CharityDB {
      * @throws SQLException 
      */
     static private void executeDonor(String[] donor) throws SQLException{
+        // get info from donor
+        String lastName = donor[0];
+        String firstName = donor[1];
+        String address = donor[2];
+        String city = donor[3];
+        String state = donor[4];
+        int zip = Integer.parseInt(donor[5]);
+        
         try {
-            //STEP 2: Register JDBC driver
+            //Register JDBC driver
             Class.forName("com.mysql.jdbc.Driver");
 
-            //STEP 3: Open a connection
+            //Open a connection
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             // Set auto-commit to false
             conn.setAutoCommit(false);
-            // get info from donor
-            String lastName = donor[0];
-            String firstName = donor[1];
-            String address = donor[2];
-            String city = donor[3];
-            String state = donor[4];
-            int zip = Integer.parseInt(donor[5]);
-            
             // check if donor table has lastName and firstName of donor
             stmt = conn.createStatement();
-            String sql;
             sql = "SELECT lastName, firstName FROM donors WHERE lastName = '" +lastName+"' AND firstName = '"+firstName+"';" ;
-            ResultSet rs = stmt.executeQuery(sql);
-            //System.out.println(rs);
-            
-            if (rs.next()){
-                // donor is in table
-                System.out.println("Donor already in the table.");
-            }
+            rs = stmt.executeQuery(sql);
+            // if donor is in the table
+            if (rs.next()){System.out.println("Donor already in the table.");}
+            // if not, then add donor to table
             else{
                 System.out.println("Adding donor to table");
                 int donorID = 1; // set donorID to start from 1
@@ -163,12 +160,12 @@ public class CharityDB {
                     rs = stmt.executeQuery(sql);
                 }
                 // add donor to table
-                sql = "INSERT INTO donors VALUES ("+donorID+", '"+lastName+"', '"+firstName+"', '" +address+"', '" +city+"', '" +state+"', '" +zip+"');";
+                sql = "INSERT INTO donors VALUES ("+donorID+", '"+lastName+"', '"+firstName+"', '" +address+"', '" +city+"', '" +state+"', " +zip+");";
                 stmt.executeUpdate(sql);
                 conn.commit();
             }
 
-            //STEP 6: Clean-up environment
+            //Clean-up environment
             rs.close();
             stmt.close();
             conn.close();
@@ -199,19 +196,138 @@ public class CharityDB {
         }//end try
     }// executeDonor()
     
-    private static void companyInfo() throws IOException{
+    /**
+     * 
+     * @throws IOException
+     * @throws SQLException 
+     */
+    private static void companyInfo() throws IOException, SQLException{
+        // ask for company information
         String[] company = new String[8];
         System.out.print("Name of company: ");
         company[0] = read.readLine();
         System.out.print("Address: ");
+        company[1]  = read.readLine();
         System.out.print("City: ");
+        company[2] = read.readLine();
         System.out.print("State: ");
+        company[3] = read.readLine();
         System.out.print("Zip: ");
-        System.out.println("Optional:");
-        System.out.print("Match Percent (1%-200%): ");
-        System.out.print("Min Match (minimum 1%): ");
-        System.out.print("Max Match (minimum 1%: ");
-    }
+        company[4] = read.readLine();
+        System.out.print("Match Percent (0%-200%): ");
+        company[5] = read.readLine();
+        System.out.print("Min Match (minimum $0): $");
+        company[6] = read.readLine();
+        System.out.print("Max Match (minimum $1): $");
+        company[7] = read.readLine();
+        // try to add the company
+        executeCompany(company);
+        // ask if want to add another company
+        System.out.println("\nDo you want to add another company?"
+                        + "\nEnter: Y or N");
+        String yn = read.readLine();
+        if ("Y".equals(yn)){companyInfo();}
+        else if ("N".equals(yn)){
+            System.out.println("\nWhat to do now?: 'done' 'add company' 'add donation'");
+            String whatNext = read.readLine();
+            if ("done".equals(whatNext)){
+                System.out.println("\nDone. Have a nice day!");
+                System.exit(1);
+            }
+            else if ("add donor".equals(whatNext)){donorInfo();}
+            else if ("add donation".equals(whatNext)){
+                // call on "add donation" method
+            }
+            else {
+                System.out.println("\nUnkown command. Try again\n");
+                whatToDo();
+            }
+        }
+        else {
+            System.out.println("\nUnkown command. Try again\n");
+            whatToDo();
+        }
+    }// companyInfo()
+    
+    /**
+     * 
+     * @param company
+     * @throws SQLException 
+     */
+    private static void executeCompany(String[] company) throws SQLException{
+        // extract the information
+        String name = company[0];
+        String address = company[1];
+        String city = company[2];
+        String state = company[3];
+        int zip = Integer.parseInt(company[4]); 
+        double matchPercent = Double.parseDouble(company[5]);
+        double minMatch = Double.parseDouble(company[6]);
+        double maxMatch = Double.parseDouble(company[7]);
+        try {
+            //Register JDBC driver
+            Class.forName("com.mysql.jdbc.Driver");
+            //Open a connection
+            System.out.println("Connecting to database...");
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            // Set auto-commit to false
+            conn.setAutoCommit(false);
+            stmt = conn.createStatement();
+            // check if 'matchingCompanies' table has company 'name'
+            sql = "SELECT name FROM matchingCompanies WHERE name = '"+name+"';";
+            rs = stmt.executeQuery(sql);
+            // if company is already in table, do nothing.
+            if (rs.next()){System.out.println("Company already in the Table");}
+            else {
+                System.out.println("Adding company to table...");
+                // initilize companyID
+                int companyID = 0;
+                // check for free companyID
+                sql = "SELECT companyID FROM matchingCompanies WHERE companyID = '"+companyID+"';";
+                rs = stmt.executeQuery(sql);
+                while (rs.next() == true){
+                    // incriment companyID by 1 and look again
+                    companyID +=1;
+                    sql = "SELECT companyID FROM matchingCompanies WHERE companyID = '"+companyID+"';";
+                    rs = stmt.executeQuery(sql);
+                }
+                System.out.println(companyID);
+                // add company to table
+                sql = "INSERT INTO matchingCompanies VALUES ("+companyID+", '"+name+"', '"+address+"', '"+city+"', '"+state+"', "+zip+", "+matchPercent+", "+minMatch+", "+maxMatch+");";
+                stmt.executeUpdate(sql);
+                conn.commit();
+            }
+            //Clean-up environment
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+            // in case of exception, rollback the transaction
+            conn.rollback();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException se2) {
+            }// nothing we can do
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+            
+        }//end try
+    }// executeCompany()
+    
     
     
     /**

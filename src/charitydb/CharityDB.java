@@ -3,9 +3,7 @@ package charitydb;
 /**
  * Konstantin Kazantsev
  * Updating Charity Database
- * @author Marietta E. Cameron
  */
-
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,7 +40,7 @@ public class CharityDB {
         if ("add donor".equals(doing)){donorInfo();}
         else if ("add company".equals(doing)){companyInfo();}
         else if ("add donation".equals(doing)){addDonation();}
-        else if ("done".equals(doing)){System.out.println("\nDone. Have a nice day!");System.exit(1);}
+        else if ("done".equals(doing)){System.out.println("\nDone. Have a nice day!");System.exit(0);}
         else {
             // Unknown command or misspelled
             System.out.println("\nERROR: Unknown command or command misspelled. Try again.");
@@ -82,7 +80,7 @@ public class CharityDB {
             String whatNext = read.readLine();
             if ("done".equals(whatNext)){
                 System.out.println("\nDone. Have a nice day!");
-                System.exit(1);
+                System.exit(0);
             }
             else if ("add company".equals(whatNext)){companyInfo();}
             else if ("add donation".equals(whatNext)){addDonation();}
@@ -145,7 +143,6 @@ public class CharityDB {
                 stmt.executeUpdate(sql);
                 conn.commit();
             }
-
             //Clean-up environment
             rs.close();
             stmt.close();
@@ -166,10 +163,8 @@ public class CharityDB {
             }// nothing we can do
             try {
                 if (conn != null) {conn.close();}
-            } catch (SQLException se) {
-                se.printStackTrace();
+            } catch (SQLException se) {se.printStackTrace();
             }//end finally try
-            
         }//end try
     }// executeDonor()
     
@@ -209,7 +204,7 @@ public class CharityDB {
             String whatNext = read.readLine();
             if ("done".equals(whatNext)){
                 System.out.println("\nDone. Have a nice day!");
-                System.exit(1);
+                System.exit(0);
             }
             else if ("add donor".equals(whatNext)){donorInfo();}
             else if ("add donation".equals(whatNext)){addDonation();}
@@ -295,11 +290,15 @@ public class CharityDB {
             } catch (SQLException se) {
                 se.printStackTrace();
             }//end finally try
-            
         }//end try
     }// executeCompany()
     
-    private static void addDonation() throws IOException{
+    /**
+     * 
+     * @throws IOException
+     * @throws SQLException 
+     */
+    private static void addDonation() throws IOException, SQLException{
         System.out.print("Last name of donor: ");
         String lastName = read.readLine();
         System.out.print("First name of donor: ");
@@ -309,12 +308,83 @@ public class CharityDB {
         System.out.print("Amount donated (amount over $0): $");
         String donated = read.readLine();
         // get donorID
-        // if donor not in table, ask to have donor first be added
-        // else: check for unused 'donationNumber'
-        // add recod to donation table
-        // ask if user wants to add another donation
-        // else: what user wants to do next
-    }
+        try {
+            //Register JDBC driver
+            Class.forName("com.mysql.jdbc.Driver");
+            //Open a connection
+            System.out.println("Connecting to database...");
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            // Set auto-commit to false
+            conn.setAutoCommit(false);
+            stmt = conn.createStatement();
+            // get donorID
+            sql = "SELECT donorID FROM donors WHERE lastName = '"+lastName+"' AND firstName = '"+firstName+"';";
+            rs = stmt.executeQuery(sql);
+            String donorID = ""; 
+            while (rs.next()){
+                donorID = rs.getString("donorID");
+            }
+            // make sure donorID is not empty string
+            if ("".equals(donorID)){
+                System.out.println("Donor does not exist or "
+                        + "misspelled donors name");
+                System.exit(1);
+            }
+            // get companyID
+            sql = "SELECT companyID FROM matchingCompanies WHERE name = '"+company+"';";
+            rs = stmt.executeQuery(sql);
+            String companyID = "";
+            while (rs.next()){
+                companyID = rs.getString("companyID");
+            }
+            // make sure companyID is not empty string
+            if ("".equals(companyID)){
+                System.out.println("Company does not exist or "
+                        + "misspelled companies name");
+                System.exit(1);
+            }
+        // block table
+        
+            // check for unused 'donationNumber'
+            int donationNumber = 1;
+            sql = "SELECT donationNumber FROM donations WHERE donationNumber = "+donationNumber+";";
+            rs = stmt.executeQuery(sql);
+            while (rs.next() == true){
+                donationNumber += 1;
+                sql = "SELECT donationNumber FROM donations WHERE donationNumber = "+donationNumber+";";
+                rs = stmt.executeQuery(sql);
+            }
+            // add recod to donation table
+            System.out.println("Adding donation record...");
+            sql = "INSERT INTO donations VALUES ("+donationNumber+", "+donorID+", "+companyID+", "+donated+");";
+            stmt.executeUpdate(sql);
+            //conn.commit();
+            //Clean-up environment
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+            // in case of exception, rollback the transaction
+            conn.rollback();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null) {stmt.close();}
+            } catch (SQLException se2) {
+            }// nothing we can do
+            try {
+                if (conn != null) {conn.close();}
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
+        whatToDo();// what to do next
+    }// addDonation()
     
     /**
      *
@@ -325,7 +395,5 @@ public class CharityDB {
     public static void main(String[] args) throws IOException, SQLException{
         // start cycle
         whatToDo();
-        
-    }//end main
-    
+    }//end main 
 }//end CharityDB

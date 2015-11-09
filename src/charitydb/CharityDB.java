@@ -126,7 +126,8 @@ public class CharityDB {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             // Set auto-commit to false
             conn.setAutoCommit(false);
-            // check if donor table has lastName and firstName of donor
+            // lock table then check if donor table has lastName and firstName of donor
+            lock = "LOCK TABLE donors WRITE;";
             stmt = conn.createStatement();
             sql = "SELECT lastName, firstName FROM donors WHERE lastName = '" + lastName + "' AND firstName = '" + firstName + "';";
             rs = stmt.executeQuery(sql);
@@ -139,6 +140,7 @@ public class CharityDB {
                 int donorID = 1; // set donorID to start from 1
                 // check for free donorID
                 sql = "SELECT donorID FROM donors WHERE donorID = " + donorID + ";";
+                stmt.executeQuery(lock);
                 rs = stmt.executeQuery(sql);
                 // while donorID exists
                 while (rs.next() == true) {
@@ -148,9 +150,7 @@ public class CharityDB {
                     rs = stmt.executeQuery(sql);
                 }
                 // add donor to table
-                lock = "LOCK TABLE donors WRITE;";
-                sql = "INSERT INTO donors VALUES (" + donorID + ", '" + lastName + "', '" + firstName + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ");";
-                stmt.executeQuery(lock);
+                sql = "INSERT INTO donors VALUES (" + donorID + ", '" + lastName + "', '" + firstName + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ");"; 
                 stmt.executeUpdate(sql);
                 conn.commit();
             }

@@ -120,14 +120,16 @@ public class CharityDB {
         try {
             //Register JDBC driver
             Class.forName("com.mysql.jdbc.Driver");
-
             //Open a connection
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            // lock table
+            lock = "LOCK TABLE donors WRITE;";
+            stmt.executeUpdate(lock);
             // Set auto-commit to false
             conn.setAutoCommit(false);
-            // lock table then check if donor table has lastName and firstName of donor
-            lock = "LOCK TABLE donors WRITE;";
+            //check if donor table has lastName and firstName of donor
+            
             stmt = conn.createStatement();
             sql = "SELECT lastName, firstName FROM donors WHERE lastName = '" + lastName + "' AND firstName = '" + firstName + "';";
             rs = stmt.executeQuery(sql);
@@ -140,7 +142,6 @@ public class CharityDB {
                 int donorID = 1; // set donorID to start from 1
                 // check for free donorID
                 sql = "SELECT donorID FROM donors WHERE donorID = " + donorID + ";";
-                stmt.executeQuery(lock);
                 rs = stmt.executeQuery(sql);
                 // while donorID exists
                 while (rs.next() == true) {
@@ -152,6 +153,8 @@ public class CharityDB {
                 // add donor to table
                 sql = "INSERT INTO donors VALUES (" + donorID + ", '" + lastName + "', '" + firstName + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ");"; 
                 stmt.executeUpdate(sql);
+                // unlock the tables
+                stmt.executeUpdate(unlock);
                 conn.commit();
             }
             //Clean-up environment

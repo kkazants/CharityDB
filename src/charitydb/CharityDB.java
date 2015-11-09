@@ -2,6 +2,7 @@ package charitydb;
 
 /**
  * Konstantin Kazantsev Updating Charity Database
+ * Lucas Clarke Lock/Unlock Tables
  */
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,11 +22,14 @@ public class CharityDB {
     // Set up Input Stream Reader and Burreded it to read
     static final InputStreamReader inputStreamReader = new InputStreamReader(System.in);
     static BufferedReader read = new BufferedReader(inputStreamReader);
-
+    
     static Connection conn = null;
     static Statement stmt = null;
     static String sql;
     static ResultSet rs;
+    static String lock;
+    static String unlock = "UNLOCK TABLES;";
+    
 
     /**
      *
@@ -112,7 +116,7 @@ public class CharityDB {
         String city = donor[3];
         String state = donor[4];
         int zip = Integer.parseInt(donor[5]);
-
+        
         try {
             //Register JDBC driver
             Class.forName("com.mysql.jdbc.Driver");
@@ -144,7 +148,9 @@ public class CharityDB {
                     rs = stmt.executeQuery(sql);
                 }
                 // add donor to table
+                lock = "LOCK TABLE donors WRITE;";
                 sql = "INSERT INTO donors VALUES (" + donorID + ", '" + lastName + "', '" + firstName + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ");";
+                stmt.executeQuery(lock);
                 stmt.executeUpdate(sql);
                 conn.commit();
             }
@@ -152,6 +158,7 @@ public class CharityDB {
             rs.close();
             stmt.close();
             conn.close();
+            
         } catch (SQLException se) {
             //Handle errors for JDBC
             se.printStackTrace();
@@ -275,7 +282,9 @@ public class CharityDB {
                 }
                 System.out.println(companyID);
                 // add company to table
+                lock = "LOCK TABLE mathingCompanies WRITE;";
                 sql = "INSERT INTO matchingCompanies VALUES (" + companyID + ", '" + name + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ", " + matchPercent + ", " + minMatch + ", " + maxMatch + ");";
+                stmt.executeQuery(lock);
                 stmt.executeUpdate(sql);
                 conn.commit();
             }
@@ -371,8 +380,10 @@ public class CharityDB {
                 rs = stmt.executeQuery(sql);
             }
             // add recod to donation table
+            lock = "LOCK TABLE donations WRITE;";
             System.out.println("Adding donation record...");
             sql = "INSERT INTO donations VALUES (" + donationNumber + ", " + donorID + ", " + companyID + ", " + donated + ");";
+            stmt.executeQuery(lock);
             stmt.executeUpdate(sql);
             conn.commit();
             //Clean-up environment
@@ -414,6 +425,8 @@ public class CharityDB {
      */
     public static void main(String[] args) throws IOException, SQLException {
         // start cycle
+        
         whatToDo();
+        stmt.executeUpdate(unlock);
     }//end main 
 }//end CharityDB

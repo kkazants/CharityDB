@@ -116,21 +116,19 @@ public class CharityDB {
         String city = donor[3];
         String state = donor[4];
         int zip = Integer.parseInt(donor[5]);
-        
         try {
             //Register JDBC driver
             Class.forName("com.mysql.jdbc.Driver");
             //Open a connection
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
             // lock table
             lock = "LOCK TABLE donors WRITE;";
             stmt.executeUpdate(lock);
             // Set auto-commit to false
             conn.setAutoCommit(false);
             //check if donor table has lastName and firstName of donor
-            
-            stmt = conn.createStatement();
             sql = "SELECT lastName, firstName FROM donors WHERE lastName = '" + lastName + "' AND firstName = '" + firstName + "';";
             rs = stmt.executeQuery(sql);
             // if donor is in the table

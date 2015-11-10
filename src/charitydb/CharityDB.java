@@ -261,7 +261,6 @@ public class CharityDB {
                     sql = "SELECT companyID FROM matchingCompanies WHERE companyID = '" + companyID + "';";
                     rs = stmt.executeQuery(sql);
                 }
-                System.out.println(companyID);
                 // add company to table
                 sql = "INSERT INTO matchingCompanies VALUES (" + companyID + ", '" + name + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ", " + matchPercent + ", " + minMatch + ", " + maxMatch + ");";
                 stmt.executeUpdate(sql);

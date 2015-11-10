@@ -349,7 +349,8 @@ public class CharityDB {
                 System.exit(0);
             }
         // block table
-
+            lock = "LOCK TABLE donations WRITE;";
+            stmt.executeUpdate(lock);
             // check for unused 'donationNumber'
             int donationNumber = 1;
             sql = "SELECT donationNumber FROM donations WHERE donationNumber = " + donationNumber + ";";
@@ -360,13 +361,11 @@ public class CharityDB {
                 rs = stmt.executeQuery(sql);
             }
             // add recod to donation table
-            lock = "LOCK TABLE donations WRITE;";
             System.out.println("Adding donation record...");
             sql = "INSERT INTO donations VALUES (" + donationNumber + ", " + donorID + ", " + companyID + ", " + donated + ");";
-            stmt.executeUpdate(lock);
             stmt.executeUpdate(sql);
-            stmt.executeUpdate(unlock);
             conn.commit();
+            stmt.executeUpdate(unlock);
             //Clean-up environment
             rs.close();
             stmt.close();
@@ -376,7 +375,7 @@ public class CharityDB {
             se.printStackTrace();
             // in case of exception, rollback the transaction
             conn.rollback();
-            
+            stmt.executeUpdate(unlock);
         } catch (Exception e) {
             //Handle errors for Class.forName
             e.printStackTrace();

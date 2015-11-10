@@ -386,7 +386,7 @@ public class CharityDB {
             lock = "LOCK TABLE donations WRITE;";
             System.out.println("Adding donation record...");
             sql = "INSERT INTO donations VALUES (" + donationNumber + ", " + donorID + ", " + companyID + ", " + donated + ");";
-            stmt.executeQuery(lock);
+            stmt.executeUpdate(lock);
             stmt.executeUpdate(sql);
             conn.commit();
             //Clean-up environment

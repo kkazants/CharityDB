@@ -115,6 +115,8 @@ public class CharityDB {
             // lock table
             lock = "LOCK TABLE donors WRITE;";
             stmt.executeUpdate(lock);
+            lock = "LOCK TABLE donors READ;";
+            stmt.executeUpdate(lock);
             conn.setAutoCommit(false);
             //check if donor table has lastName and firstName of donor
             sql = "SELECT lastName, firstName FROM donors WHERE lastName = '" + lastName + "' AND firstName = '" + firstName + "';";
@@ -251,6 +253,8 @@ public class CharityDB {
                 // check for free companyID
                 lock = "LOCK TABLE matchingCompanies WRITE;";
                 stmt.executeUpdate(lock);
+                lock = "LOCK TABLE matchingCompanies READ;";
+                stmt.executeUpdate(lock);
                 // Set auto-commit to false
                 conn.setAutoCommit(false);
                 sql = "SELECT companyID FROM matchingCompanies WHERE companyID = '" + companyID + "';";
@@ -350,6 +354,8 @@ public class CharityDB {
             }
         // block table
             lock = "LOCK TABLE donations WRITE;";
+            stmt.executeUpdate(lock);
+            lock = "LOCK TABLE donations READ;";
             stmt.executeUpdate(lock);
             // check for unused 'donationNumber'
             int donationNumber = 1;

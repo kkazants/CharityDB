@@ -260,8 +260,6 @@ public class CharityDB {
             //Open a connection
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            // Set auto-commit to false
-            conn.setAutoCommit(false);
             stmt = conn.createStatement();
             // check if 'matchingCompanies' table has company 'name'
             sql = "SELECT name FROM matchingCompanies WHERE name = '" + name + "';";
@@ -274,6 +272,10 @@ public class CharityDB {
                 // initilize companyID
                 int companyID = 0;
                 // check for free companyID
+                lock = "LOCK TABLE matchingCompanies WRITE;";
+                stmt.executeUpdate(lock);
+                // Set auto-commit to false
+                conn.setAutoCommit(false);
                 sql = "SELECT companyID FROM matchingCompanies WHERE companyID = '" + companyID + "';";
                 rs = stmt.executeQuery(sql);
                 while (rs.next() == true) {
@@ -284,9 +286,7 @@ public class CharityDB {
                 }
                 System.out.println(companyID);
                 // add company to table
-                lock = "LOCK TABLE mathingCompanies WRITE;";
                 sql = "INSERT INTO matchingCompanies VALUES (" + companyID + ", '" + name + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ", " + matchPercent + ", " + minMatch + ", " + maxMatch + ");";
-                stmt.executeUpdate(lock);
                 stmt.executeUpdate(sql);
                 stmt.executeUpdate(unlock);
                 conn.commit();

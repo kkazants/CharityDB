@@ -3,6 +3,7 @@ package charitydb;
 /**
  * Konstantin Kazantsev Updating Charity Database
  * Lucas Clarke Lock/Unlock Tables
+ * Zack Wiseman
  */
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -123,19 +124,17 @@ public class CharityDB {
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = conn.createStatement();
-            
-            //check if donor table has lastName and firstName of donor
-            sql = "SELECT lastName, firstName FROM donors WHERE lastName = '" + lastName + "' AND firstName = '" + firstName + "';";
-            rs = stmt.executeQuery(sql);
             // lock table
             lock = "LOCK TABLE donors WRITE;";
             stmt.executeUpdate(lock);
-            // Set auto-commit to false
             conn.setAutoCommit(false);
+            //check if donor table has lastName and firstName of donor
+            sql = "SELECT lastName, firstName FROM donors WHERE lastName = '" + lastName + "' AND firstName = '" + firstName + "';";
+            rs = stmt.executeQuery(sql);
             // if donor is in the table
             if (rs.next()) {
                 System.out.println("Donor already in the table.");
-                stmt.executeUpdate(unlock);
+                //stmt.executeUpdate(unlock);
             } // if not, then add donor to table
             else {
                 System.out.println("Adding donor to table");

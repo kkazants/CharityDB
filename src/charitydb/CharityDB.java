@@ -285,8 +285,9 @@ public class CharityDB {
                 // add company to table
                 lock = "LOCK TABLE mathingCompanies WRITE;";
                 sql = "INSERT INTO matchingCompanies VALUES (" + companyID + ", '" + name + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ", " + matchPercent + ", " + minMatch + ", " + maxMatch + ");";
-                stmt.executeQuery(lock);
+                stmt.executeUpdate(lock);
                 stmt.executeUpdate(sql);
+                stmt.executeUpdate(unlock);
                 conn.commit();
             }
             //Clean-up environment

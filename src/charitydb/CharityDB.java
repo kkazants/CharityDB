@@ -388,6 +388,7 @@ public class CharityDB {
             sql = "INSERT INTO donations VALUES (" + donationNumber + ", " + donorID + ", " + companyID + ", " + donated + ");";
             stmt.executeUpdate(lock);
             stmt.executeUpdate(sql);
+            stmt.executeUpdate(unlock);
             conn.commit();
             //Clean-up environment
             rs.close();

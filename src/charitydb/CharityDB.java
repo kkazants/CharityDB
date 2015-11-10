@@ -1,8 +1,9 @@
 package charitydb;
 
 /**
- * Konstantin Kazantsev Updating Charity Database
- * Lucas Clarke Lock/Unlock Tables
+ * Updating Charity Database by:
+ * Konstantin Kazantsev 
+ * Lucas Clarke 
  * Zack Wiseman
  */
 import java.io.BufferedReader;

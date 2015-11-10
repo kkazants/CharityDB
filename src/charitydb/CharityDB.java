@@ -165,6 +165,7 @@ public class CharityDB {
             se.printStackTrace();
             // in case of exception, rollback the transaction
             conn.rollback();
+            stmt.executeUpdate(unlock);
         } catch (Exception e) {
             //Handle errors for Class.forName
             e.printStackTrace();

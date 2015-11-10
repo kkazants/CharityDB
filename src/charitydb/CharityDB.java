@@ -334,7 +334,7 @@ public class CharityDB {
             if ("".equals(donorID)) {
                 System.out.println("Donor does not exist or "
                         + "misspelled donors name");
-                System.exit(1);
+                System.exit(0);
             }
             // get companyID
             sql = "SELECT companyID FROM matchingCompanies WHERE name = '" + company + "';";
@@ -347,7 +347,7 @@ public class CharityDB {
             if ("".equals(companyID)) {
                 System.out.println("Company does not exist or "
                         + "misspelled companies name");
-                System.exit(1);
+                System.exit(0);
             }
         // block table
 

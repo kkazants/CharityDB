@@ -3,6 +3,7 @@ package charitydb;
 /**
  * Konstantin Kazantsev Updating Charity Database
  * Lucas Clarke Lock/Unlock Tables
+ * Zack Wiseman
  */
 import java.io.BufferedReader;
 import java.io.IOException;

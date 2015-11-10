@@ -38,7 +38,7 @@ public class CharityDB {
      * @throws SQLException
      */
     private static void whatToDo() throws IOException, SQLException {
-        System.out.println("What would you like to do? \nEnter: 'add donor', 'add company', or 'add donation' without the quotes.");
+        System.out.println("What would you like to do? \nEnter: 'add donor', 'add company', 'add donation', or 'done' without the quotes.");
         String doing = read.readLine();
         if ("add donor".equals(doing)) {
             donorInfo();
@@ -85,19 +85,7 @@ public class CharityDB {
         if ("Y".equals(yn)) {
             donorInfo();
         } else if ("N".equals(yn)) {
-            System.out.println("\nWhat to do now?: 'done' 'add company' 'add donation'");
-            String whatNext = read.readLine();
-            if ("done".equals(whatNext)) {
-                System.out.println("\nDone. Have a nice day!");
-                System.exit(0);
-            } else if ("add company".equals(whatNext)) {
-                companyInfo();
-            } else if ("add donation".equals(whatNext)) {
-                addDonation();
-            } else {
-                System.out.println("\nUnkown command. Try again\n");
-                whatToDo();
-            }
+            whatToDo();
         } else {
             System.out.println("\nUnkown command. Try again\n");
             whatToDo();
@@ -221,19 +209,7 @@ public class CharityDB {
         if ("Y".equals(yn)) {
             companyInfo();
         } else if ("N".equals(yn)) {
-            System.out.println("\nWhat to do now?: 'done' 'add company' 'add donation'");
-            String whatNext = read.readLine();
-            if ("done".equals(whatNext)) {
-                System.out.println("\nDone. Have a nice day!");
-                System.exit(0);
-            } else if ("add donor".equals(whatNext)) {
-                donorInfo();
-            } else if ("add donation".equals(whatNext)) {
-                addDonation();
-            } else {
-                System.out.println("\nUnkown command. Try again\n");
-                whatToDo();
-            }
+            whatToDo();
         } else {
             System.out.println("\nUnkown command. Try again\n");
             whatToDo();
@@ -421,7 +397,19 @@ public class CharityDB {
                 se.printStackTrace();
             }//end finally try
         }//end try
-        whatToDo();// what to do next
+        // What to do next
+        System.out.println("\nDo you want to add another donation?"
+                + "\nEnter Y or N");
+        String yn = read.readLine();
+        if ("Y".equals(yn)){
+            addDonation();
+        }
+        else if ("N".equals(yn)){
+            whatToDo();
+        } else {
+            System.out.println("\nUnkown command. Try again\n");
+            whatToDo();
+        }
     }// addDonation()
 
     /**

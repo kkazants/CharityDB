@@ -113,9 +113,7 @@ public class CharityDB {
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = conn.createStatement();
-            // lock table
-            lock = "LOCK TABLE donors WRITE;";
-            stmt.executeUpdate(lock);
+            // lock table READ
             lock = "LOCK TABLE donors READ;";
             stmt.executeUpdate(lock);
             conn.setAutoCommit(false);
@@ -128,7 +126,6 @@ public class CharityDB {
                 //stmt.executeUpdate(unlock);
             } // if not, then add donor to table
             else {
-                System.out.println("Adding donor to table");
                 int donorID = 1; // set donorID to start from 1
                 // check for free donorID
                 sql = "SELECT donorID FROM donors WHERE donorID = " + donorID + ";";
@@ -140,6 +137,10 @@ public class CharityDB {
                     sql = "SELECT donorID FROM donors WHERE donorID = " + donorID + ";";
                     rs = stmt.executeQuery(sql);
                 }
+                System.out.println("Adding donor to table...");
+                // lock table WRITE
+                lock = "LOCK TABLE donors WRITE;";
+                stmt.executeUpdate(lock);
                 // add donor to table
                 sql = "INSERT INTO donors VALUES (" + donorID + ", '" + lastName + "', '" + firstName + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ");"; 
                 stmt.executeUpdate(sql);
@@ -248,16 +249,14 @@ public class CharityDB {
             if (rs.next()) {
                 System.out.println("Company already in the Table");
             } else {
-                System.out.println("Adding company to table...");
                 // initilize companyID
                 int companyID = 0;
-                // check for free companyID
-                lock = "LOCK TABLE matchingCompanies WRITE;";
-                stmt.executeUpdate(lock);
+                // lock table READ
                 lock = "LOCK TABLE matchingCompanies READ;";
                 stmt.executeUpdate(lock);
                 // Set auto-commit to false
                 conn.setAutoCommit(false);
+                // check for free companyID
                 sql = "SELECT companyID FROM matchingCompanies WHERE companyID = '" + companyID + "';";
                 rs = stmt.executeQuery(sql);
                 while (rs.next() == true) {
@@ -266,6 +265,10 @@ public class CharityDB {
                     sql = "SELECT companyID FROM matchingCompanies WHERE companyID = '" + companyID + "';";
                     rs = stmt.executeQuery(sql);
                 }
+                System.out.println("Adding company to table...");
+                // lock table WRITE
+                lock = "LOCK TABLE matchingCompanies WRITE;";
+                stmt.executeUpdate(lock);
                 // add company to table
                 sql = "INSERT INTO matchingCompanies VALUES (" + companyID + ", '" + name + "', '" + address + "', '" + city + "', '" + state + "', " + zip + ", " + matchPercent + ", " + minMatch + ", " + maxMatch + ");";
                 stmt.executeUpdate(sql);
@@ -353,9 +356,7 @@ public class CharityDB {
                         + "misspelled companies name");
                 System.exit(0);
             }
-        // block table
-            lock = "LOCK TABLE donations WRITE;";
-            stmt.executeUpdate(lock);
+            // block table READ
             lock = "LOCK TABLE donations READ;";
             stmt.executeUpdate(lock);
             // check for unused 'donationNumber'
@@ -367,8 +368,11 @@ public class CharityDB {
                 sql = "SELECT donationNumber FROM donations WHERE donationNumber = " + donationNumber + ";";
                 rs = stmt.executeQuery(sql);
             }
-            // add recod to donation table
             System.out.println("Adding donation record...");
+            // lock table WRITE
+            lock = "LOCK TABLE donations WRITE;";
+            stmt.executeUpdate(lock);
+            // add recod to donation table
             sql = "INSERT INTO donations VALUES (" + donationNumber + ", " + donorID + ", " + companyID + ", " + donated + ");";
             stmt.executeUpdate(sql);
             conn.commit();
